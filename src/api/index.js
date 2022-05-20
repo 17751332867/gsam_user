@@ -39,3 +39,5 @@ export const insertChromosomes = (params) => post('chromosome/insertChromosomes'
 export const selectChromosomesByUserId = (id) => get(`chromosome/selectChromosomesByUserId?id=${id}`)
 
 export const productFa = (params) => get('chromosome/productFa', params)
+
+export const deleteChromosomeById = (id) => get(`chromosome/delete?id=${id}`)

@@ -1,5 +1,5 @@
 <template>
-<div>
+<d2-container>
   <el-row>
     <el-col :span="8">
       <el-input placeholder="请输入名称" prefix-icon="el-icon-search" v-model="name"></el-input>
@@ -55,7 +55,7 @@
       </div>
     </el-dialog>
   </div>
-</div>
+</d2-container>
 </template>
 
 <script>

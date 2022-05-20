@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <d2-container>
     <el-table
       :data="tableData"
       border
@@ -56,6 +56,7 @@
           <el-tag v-if="scope.row.status==='未生成序列'" type="info">{{scope.row.status}}</el-tag>
           <el-tag v-if="scope.row.status==='生成中'" type="danger">{{scope.row.status}}</el-tag>
           <el-tag v-if="scope.row.status==='完成'" type="success">{{scope.row.status}}</el-tag>
+          <el-tag v-if="scope.row.status==='排队中'" type="text">{{scope.row.status}}</el-tag>
         </template>
         <el-tag></el-tag>
       </el-table-column>
@@ -83,7 +84,7 @@
         <template slot-scope="scope">
           <el-button v-if="scope.row.status==='未生成序列'" type="info" @click="beforeProduct(scope.row.id)">生成</el-button>
           <el-button v-if="scope.row.status==='完成'" type="primary" @click="download(scope.row)">下载数据</el-button>
-          <el-button>删除</el-button>
+          <el-button @click="beforeDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -102,18 +103,33 @@
         <el-button type="primary" @click="handleProduct">确 定</el-button>
       </div>
     </el-dialog>
-  </div>
+    <el-dialog
+      title="提示"
+      :visible.sync="deleteVisible"
+      width="30%"
+      :before-close="handleClose">
+      <span>你确定要删除用户:{{deleteChromosome.name}}吗</span>
+      <span slot="footer" class="dialog-footer">
+                <el-button @click="deleteVisible = false">取 消</el-button>
+                <el-button type="primary" @click="handleDeleteChromosome">确 定</el-button>
+            </span>
+    </el-dialog>
+  </d2-container>
 </template>
 
 <script>
 import Cookies from 'js-cookie'
-import {productFa, selectChromosomesByUserId} from '../../../../api'
-import {baseURL} from '../../../../api/http'
+import { deleteChromosomeById, productFa, selectChromosomesByUserId } from '../../../../api'
+import { baseURL } from '../../../../api/http'
 
 export default {
   name: 'MyChromosome',
   data () {
     return {
+      deleteVisible: false,
+      deleteChromosome: {
+
+      },
       productVisiable: false,
       user: null,
       tableData: [],
@@ -126,6 +142,25 @@ export default {
     }
   },
   methods: {
+    handleDeleteChromosome () {
+      deleteChromosomeById(this.deleteChromosome.id).then(res => {
+        this.init()
+        this.$notify.success('删除成功')
+        this.deleteVisible = false
+      })
+    },
+    handleClose (done) {
+      this.$confirm('确认关闭？')
+        .then(_ => {
+          done()
+        })
+        .catch(_ => {
+        })
+    },
+    beforeDelete (data) {
+      this.deleteChromosome = data
+      this.deleteVisible = true
+    },
     downFile (fileName, url) {
       const el = document.createElement('a')
       el.style.display = 'none'
@@ -137,8 +172,8 @@ export default {
       document.body.removeChild(el)
     },
     download (row) {
-      this.downFile(row.name, baseURL+row.chromosomeUrl)
-      this.downFile('read' + row.length + '.fa', baseURL+row.faUrl)
+      this.downFile(row.name, baseURL + row.chromosomeUrl)
+      this.downFile('read' + row.length + '.fa', baseURL + row.faUrl)
     },
     async handleProduct () {
       await productFa(this.product).then(res => {
@@ -152,7 +187,7 @@ export default {
       this.product.id = id
       this.productVisiable = true
     },
-    tableRowClassName ({row, rowIndex}) {
+    tableRowClassName ({ row, rowIndex }) {
       if (rowIndex % 2 === 1) {
         return 'warning-row'
       } else {

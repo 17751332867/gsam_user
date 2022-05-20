@@ -21,7 +21,7 @@
       </el-col>
     </el-row>
     <el-row>
-      <el-card style="height: 350px">
+      <el-card style="height: 400px">
         <el-col :span="12">
           <el-transfer
             width="800px"
@@ -63,6 +63,7 @@ export default {
   name: 'Chromosome',
   data () {
     return {
+      websocket: null,
       mapper: {},
       visiable: false,
       value: [],
@@ -152,6 +153,7 @@ export default {
       host = host.replace('http', 'ws')
       console.log(host)
       this.websock = new WebSocket(host)
+      // console.log(this.websock)
       // 监听打开
       this.websock.onopen = (Session) => {
         console.log('开始监听', Session.data)

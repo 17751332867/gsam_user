@@ -223,13 +223,18 @@ export default {
       // 具体需要传递的数据请自行修改代码
       const param = { username: this.formLogin.username, password: this.formLogin.password }
       // console.log(param)
+      if (this.formLogin.code !== 'v9am') {
+        this.$notify.error('验证码错误')
+        return
+      }
       login(param).then(res => {
         if (res.msg === 'success') {
           Cookies.set('user', JSON.stringify(res.data))
           util.cookies.set('token', res.data)
-          this.$router.replace(this.$route.query.redirect || '/demo/components/index/index')
+          this.$notify.success('登陆成功')
+          this.$router.replace(this.$route.query.redirect || '/index')
         } else {
-          this.$message.error(res)
+          this.$notify.error('用户或密码错误')
         }
       })
       //   } else {
